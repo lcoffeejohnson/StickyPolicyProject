@@ -10,6 +10,11 @@ public class StickyHeader implements Serializable {
     this.data = data;
     this.policy = policy;
   }
+
+  public StickyHeader(StickyHeader stickyHeader) {
+    this.data = stickyHeader.getData();
+    this.policy = new Policy (stickyHeader.getPolicy());
+  }  
    
   public String getData() {
     return data;

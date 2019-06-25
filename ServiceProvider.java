@@ -26,6 +26,18 @@ public class ServiceProvider {
     myServer = new Server(50001);
   } 
 
+ 
+  public UserData copyData(UserData data) {
+    return new UserData(new StickyHeader(data.stickyHeader), data.hash);
+  }
+
+  public void storeData(UserData data, int copies) {
+    database.add(data);
+    for (int i = 0; i < copies; i++) {
+      database.add(copyData(data));
+    }
+  } 
+
   public int deleteData(int delHash) {
     int foundData = 0;
     int databaseSize = database.size();
@@ -48,7 +60,7 @@ public class ServiceProvider {
     switch (msgType) {
     case UPLOAD:
       if (msgSH != null && msgHash != 0) {
-        database.add(new UserData(msgSH, msgHash));
+        storeData(new UserData(msgSH, msgHash), 2); //store data and 2 copies
       }
       else System.out.println("Message upload failed");
       break;
@@ -76,7 +88,7 @@ public class ServiceProvider {
       str += database.get(i).ts + ", ";
       str += database.get(i).stickyHeader + ", ";
       str += database.get(i).hash + ", " + database.get(i).valid;
-      if (i < databaseSize - 1) str += "\n";
+      if (i < databaseSize - 1) str += "\n  ";
       else str += " ]";
     }
     return str;
@@ -94,6 +106,6 @@ public class ServiceProvider {
     catch (ClassNotFoundException c) {
       System.out.println(c);
     }
-  System.out.println("Database: " + sp);
+  System.out.println("Database:\n" + sp);
   }
 }
