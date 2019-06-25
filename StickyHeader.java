@@ -19,4 +19,7 @@ public class StickyHeader implements Serializable {
     return policy;
   }
 
+  public String toString() {
+    return data;
+  }
 }

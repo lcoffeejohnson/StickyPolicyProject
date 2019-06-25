@@ -24,24 +24,37 @@ public class ServiceProvider {
 
   public ServiceProvider() {
     myServer = new Server(50001);
+  } 
+
+  public int deleteData(int delHash) {
+    int foundData = 0;
+    int databaseSize = database.size();
+    
+    for (int i = 0; i < databaseSize; i++) {
+      if (database.get(i).hash == delHash) {
+        database.get(i).valid = false;
+        foundData++;
+      }
+    }
+
+    return foundData; //Number deleted
   }
 
   public StickyHeader interpretMessage(Message msg) {
     MessageType msgType = msg.getMessageType();    
     StickyHeader msgSH = msg.getStickyHeader();
-  
+    int msgHash = msg.getHash();  
+
     switch (msgType) {
     case UPLOAD:
-      int msgHash = msg.getHash();
       if (msgSH != null && msgHash != 0) {
         database.add(new UserData(msgSH, msgHash));
-        System.out.println("User data added to databse: " + msgSH.getData());
-        System.out.println("User data hash: " + msgHash);
       }
       else System.out.println("Message upload failed");
       break;
     case DELETE:
       System.out.println("Delete request recieved");
+      deleteData(msgHash);
       break;
     case NOTIFY:
       System.out.println("Notify message recieved");
@@ -54,6 +67,19 @@ public class ServiceProvider {
     }
 
     return msgSH; //Will be null if message was not an upload
+  }
+
+  public String toString() {
+    String str = "[ ";
+    int databaseSize = database.size();
+    for (int i = 0; i < databaseSize; i++) {
+      str += database.get(i).ts + ", ";
+      str += database.get(i).stickyHeader + ", ";
+      str += database.get(i).hash + ", " + database.get(i).valid;
+      if (i < databaseSize - 1) str += "\n";
+      else str += " ]";
+    }
+    return str;
   }
     
   public static void main(String[] args) {
@@ -68,6 +94,6 @@ public class ServiceProvider {
     catch (ClassNotFoundException c) {
       System.out.println(c);
     }
-  System.out.println("Database: " + sp.database);
+  System.out.println("Database: " + sp);
   }
 }
