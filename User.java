@@ -30,7 +30,19 @@ public class User {
       return false;
     }
 
-  }  
+  } 
+
+ public boolean deleteData(int hash) {
+   Message toSend = new Message(MessageType.DELETE, hash);
+   try {
+     myClient.sendMessage(myClient.getSocket(), toSend);
+     return true;
+   }
+   catch(IOException i) {
+     System.out.println(i);
+     return false;
+   }
+ } 
 
   public static void main(String[] args) {
     Policy policy = new Policy(true, true);
@@ -38,5 +50,6 @@ public class User {
     boolean sent = user.uploadData("This is some data...");
     if(sent) System.out.println("Data sent successfully!");
     else System.out.println("There was an error in sending the data");
+    user.deleteData(user.hashVals.get(0));
   }
 }

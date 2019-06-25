@@ -99,6 +99,8 @@ public class ServiceProvider {
     try {
       Message msg = sp.myServer.recieveMessage();
       sp.interpretMessage(msg);
+      Message delMsg = sp.myServer.recieveMessage();
+      sp.interpretMessage(delMsg);
     }
     catch (IOException i) {
       System.out.println(i);

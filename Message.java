@@ -11,6 +11,11 @@ public class Message implements Serializable {
     this.type = type;
   }
 
+  public Message(MessageType type, int hash) {
+    this.type = type;
+    this.hash = hash;
+  }
+
   public Message(MessageType type, StickyHeader stickyHeader, int hash) {
     this.type = type;
     this.stickyHeader = stickyHeader;
