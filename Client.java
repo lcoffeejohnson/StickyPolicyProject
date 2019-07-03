@@ -36,6 +36,8 @@ public class Client {
     //Create new Client
     Client client = new Client("localhost", 50001);
 
+    //User user = new User(new Policy(true, true));
+
     System.out.println("Set up new client");
 
     //Send Message

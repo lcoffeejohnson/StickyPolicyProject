@@ -31,6 +31,8 @@ public class Server {
     Server server = new Server(50001);
     Socket socket = null;   
 
+    ServiceProvider sp = new ServiceProvider();
+
     try {
       while (true) {
         socket = server.serverSocket.accept();
@@ -41,7 +43,8 @@ public class Server {
         } catch (ClassNotFoundException c) {
           System.out.println(c);
         }
-        System.out.println("Recieved message: " + message);  
+        System.out.println("Recieved message: " + message);
+        sp.interpretMessage(message);  
       } 
     } catch (IOException i) {
       System.out.println(i);

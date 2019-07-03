@@ -19,29 +19,12 @@ public class User {
     hashVals.add(0, sHHash);
     Message toSend = new Message(MessageType.UPLOAD, stickyHeader, sHHash);
     
-    //Try to send the message
-    try {
-      myClient.sendMessage(myClient.getSocket(), toSend);
-      return true;
-    }
-    //If unsuccessful, return false
-    catch(IOException i) {
-      System.out.println(i);
-      return false;
-    }
-
+    return myClient.sendMessage(toSend);
   } 
 
  public boolean deleteData(int hash) {
    Message toSend = new Message(MessageType.DELETE, hash);
-   try {
-     myClient.sendMessage(myClient.getSocket(), toSend);
-     return true;
-   }
-   catch(IOException i) {
-     System.out.println(i);
-     return false;
-   }
+   return myClient.sendMessage(toSend);
  } 
 
   public static void main(String[] args) {
@@ -50,6 +33,7 @@ public class User {
     boolean sent = user.uploadData("This is some data...");
     if(sent) System.out.println("Data sent successfully!");
     else System.out.println("There was an error in sending the data");
+    System.out.println(user.hashVals.get(0));
     user.deleteData(user.hashVals.get(0));
   }
 }

@@ -5,7 +5,7 @@ import java.sql.Timestamp;
 
 public class ServiceProvider {
 
-  Server myServer = null;
+  //Server myServer = null;
   ArrayList<UserData> database = new ArrayList<UserData>();
 
   public class UserData {
@@ -23,7 +23,7 @@ public class ServiceProvider {
   }
 
   public ServiceProvider() {
-    myServer = new Server(50001);
+    //myServer = new Server(50001);
   } 
 
  
@@ -61,12 +61,13 @@ public class ServiceProvider {
     case UPLOAD:
       if (msgSH != null && msgHash != 0) {
         storeData(new UserData(msgSH, msgHash), 2); //store data and 2 copies
+        System.out.println("Upload message recieved.\nUpdated database:\n" + this);
       }
       else System.out.println("Message upload failed");
       break;
     case DELETE:
-      System.out.println("Delete request recieved");
       deleteData(msgHash);
+      System.out.println("Delete request recieved.\nUpdated database:\n" + this);
       break;
     case NOTIFY:
       System.out.println("Notify message recieved");
@@ -95,8 +96,8 @@ public class ServiceProvider {
   }
     
   public static void main(String[] args) {
-    ServiceProvider sp = new ServiceProvider();
-    try {
+    //ServiceProvider sp = new ServiceProvider();
+    /*try {
       Message msg = sp.myServer.recieveMessage();
       sp.interpretMessage(msg);
       Message delMsg = sp.myServer.recieveMessage();
@@ -107,7 +108,7 @@ public class ServiceProvider {
     }
     catch (ClassNotFoundException c) {
       System.out.println(c);
-    }
-  System.out.println("Database:\n" + sp);
+    }*/
+  //System.out.println("Database:\n" + sp);
   }
 }
