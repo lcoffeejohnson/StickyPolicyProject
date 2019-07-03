@@ -6,7 +6,6 @@ import java.sql.Timestamp;
 
 public class ServiceProvider {
 
-  ServerSocket serverSocket = null;
   ArrayList<UserData> database = new ArrayList<UserData>();
 
   public class UserData {
@@ -24,10 +23,8 @@ public class ServiceProvider {
   }
 
   public ServiceProvider() {
-    //this.serverSocket = serverSocket;
   } 
 
- 
   public UserData copyData(UserData data) {
     return new UserData(new StickyHeader(data.stickyHeader), data.hash);
   }
@@ -49,7 +46,6 @@ public class ServiceProvider {
         foundData++;
       }
     }
-
     return foundData; //Number deleted
   }
 
@@ -111,7 +107,8 @@ public class ServiceProvider {
   }
     
   public static void main(String[] args) {
-    //ServiceProvider sp = new ServiceProvider();
+    ServiceProvider sp = new ServiceProvider();
+    new Server(50001, sp).start();
     /*try {
       Message msg = sp.myServer.recieveMessage();
       sp.interpretMessage(msg);

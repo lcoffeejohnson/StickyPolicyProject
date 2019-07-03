@@ -2,12 +2,14 @@
 import java.net.*;
 import java.io.*;
 
-public class Server {
+public class Server extends Thread {
 
   private ServerSocket serverSocket = null;
+  private ServiceProvider serviceProvider = null;  
 
-  public Server(int portNum) {
-  
+  public Server(int portNum, ServiceProvider serviceProvider) {
+    this.serviceProvider = serviceProvider;
+
     //Try to establish a connection
     try {
       serverSocket = new ServerSocket(portNum);
@@ -18,17 +20,14 @@ public class Server {
     }
   }
 
-  public static void main(String[] args) {
-  
-    //Create new Server object
-    Server server = new Server(50001);
-    Socket socket = null;   
+  @Override
+  public void run() {
 
-    ServiceProvider sp = new ServiceProvider();
-
-    try {
+   Socket socket = null;
+ 
+   try {
       while (true) {
-        socket = server.serverSocket.accept();
+        socket = serverSocket.accept();
         ObjectInputStream messageFromClient = new ObjectInputStream(socket.getInputStream());
         Message message = null;
         try {
@@ -37,19 +36,13 @@ public class Server {
           System.out.println(c);
         }
         System.out.println("Recieved message: " + message);
-        sp.interpretMessage(message);  
+        serviceProvider.interpretMessage(message);  
       } 
     } catch (IOException i) {
       System.out.println(i);
+    } finally {
+      try { socket.close(); } catch (IOException i) {}
     }
-     
-    //Try to close out socket
-    try {
-      socket.close();
-    }
-    catch (IOException i) {
-      System.out.println(i);
-    }
-  } 
 
+  }
 }
