@@ -18,13 +18,6 @@ public class Server {
     }
   }
 
-
- /* public Message recieveMessage() throws IOException, ClassNotFoundException {
-    ObjectInputStream messageFromClient = new ObjectInputStream(socket.getInputStream());
-    Message message = (Message) messageFromClient.readObject();
-    return message;
-  }*/ 
-
   public static void main(String[] args) {
   
     //Create new Server object

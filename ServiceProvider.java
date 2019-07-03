@@ -1,11 +1,12 @@
 
 import java.util.ArrayList;
 import java.io.*;
+import java.net.*;
 import java.sql.Timestamp;
 
 public class ServiceProvider {
 
-  //Server myServer = null;
+  ServerSocket serverSocket = null;
   ArrayList<UserData> database = new ArrayList<UserData>();
 
   public class UserData {
@@ -23,7 +24,7 @@ public class ServiceProvider {
   }
 
   public ServiceProvider() {
-    //myServer = new Server(50001);
+    //this.serverSocket = serverSocket;
   } 
 
  
@@ -52,6 +53,18 @@ public class ServiceProvider {
     return foundData; //Number deleted
   }
 
+  public StickyHeader accessData(int accessHash) {
+    int databaseSize = database.size();
+
+    for (int i = 0; i < databaseSize; i++) {
+      UserData data = database.get(i);
+      if (data.hash == accessHash && data.valid) {
+        return data.stickyHeader;
+      }
+    }
+    return null; //Data not found or allowed to be accessed
+  }
+
   public StickyHeader interpretMessage(Message msg) {
     MessageType msgType = msg.getMessageType();    
     StickyHeader msgSH = msg.getStickyHeader();
@@ -62,12 +75,14 @@ public class ServiceProvider {
       if (msgSH != null && msgHash != 0) {
         storeData(new UserData(msgSH, msgHash), 2); //store data and 2 copies
         System.out.println("Upload message recieved.\nUpdated database:\n" + this);
+        System.out.println("\nAccess attempt: " + accessData(msgHash));
       }
       else System.out.println("Message upload failed");
       break;
     case DELETE:
       deleteData(msgHash);
       System.out.println("Delete request recieved.\nUpdated database:\n" + this);
+      System.out.println("\nAccess attempt: " + accessData(msgHash));
       break;
     case NOTIFY:
       System.out.println("Notify message recieved");
