@@ -5,5 +5,9 @@ This project models a User with a policy regarding the use of personal data and 
 To run:
 
 1. Open two separate terminal windows (the Client and Server are both running on localhost)
-2. Run the ServiceProvider first
+2. Run the ServiceProvider first:
+     * \>javac ServiceProvider.java
+     * \>java ServiceProvider
 3. Next, run the User
+     * \>javac User.java
+     * \>java User
