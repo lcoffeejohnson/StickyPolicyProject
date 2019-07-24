@@ -2,13 +2,20 @@
 import java.net.*;
 import java.io.*;
 
+/**
+ * This class creates a Server to continueoulsy recieve messages 
+ * from a Client 
+ *
+ * @author Lindsey Coffee-Johnson
+ * @version 1.0
+ */
 public class Server extends Thread {
 
   private ServerSocket serverSocket = null;
-  private ServiceProvider serviceProvider = null;  
+  //private ServiceProvider serviceProvider = null;  
 
-  public Server(int portNum, ServiceProvider serviceProvider) {
-    this.serviceProvider = serviceProvider;
+  public Server(int portNum) {
+    //this.serviceProvider = serviceProvider;
 
     //Try to establish a connection
     try {
@@ -35,7 +42,7 @@ public class Server extends Thread {
           System.out.println(c);
         }
         System.out.println("Recieved message: " + message);
-        serviceProvider.interpretMessage(message);  
+        ServiceProvider.interpretMessage(message);  
       } 
     } catch (IOException i) {
       System.out.println(i);

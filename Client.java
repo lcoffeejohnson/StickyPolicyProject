@@ -2,6 +2,12 @@
 import java.net.*;
 import java.io.*;
 
+/**
+ * This class creates a Client to send messages to the Server
+ *
+ * @author Lindsey Coffee-Johnson
+ * @version 1.0
+ */
 public class Client {
 
   private String address = null;
@@ -12,10 +18,12 @@ public class Client {
     this. portNum = portNum;
   }
 
+  /**
+   * Sends a message of type Message
+   */
   public boolean sendMessage(Message message) {
       try {
         Socket socket = new Socket(address, portNum);
-        System.out.println("Client is connected to server");
         ObjectOutputStream messageToServer = new ObjectOutputStream(socket.getOutputStream());
         messageToServer.writeObject(message);
         messageToServer.flush();

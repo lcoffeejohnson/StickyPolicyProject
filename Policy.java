@@ -1,6 +1,12 @@
 
 import java.io.Serializable;
 
+/**
+ * The Policy class stores User preferences regarding data access
+ *
+ * @author Lindsey Coffee-Johnson
+ * @version 1.0
+ */
 public class Policy implements Serializable {
 
   //Examples of policy fields

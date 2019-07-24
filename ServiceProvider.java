@@ -2,47 +2,45 @@
 import java.util.ArrayList;
 import java.io.*;
 import java.net.*;
-import java.sql.Timestamp;
 
+
+/**
+ * This class simulates a ServiceProvider with a database 
+ * to store user data
+ *
+ * @author Lindsey Coffee-Johnson
+ * @version 1.0
+ */
 public class ServiceProvider {
 
   static ArrayList<UserData> database = new ArrayList<UserData>();
-  Server server = null;
-  Client client = null;
-
-  public class UserData {
-    Timestamp ts = null;
-    StickyHeader stickyHeader = null;
-    int hash = 0;
-    boolean valid = false;
-    
-    public UserData(StickyHeader stickyHeader, int hash) {
-      ts = new Timestamp(System.currentTimeMillis());
-      this.stickyHeader = stickyHeader;
-      this.hash = hash;
-      valid = true;
-    }
-  }
+  static Server server = new Server(50001);
+  static Client client = new Client("localhost", 50002);
 
   public ServiceProvider() {
-    server = new Server(50001, this);
-    client = new Client("localhost", 50002);  
-    server.start();
   }
- 
 
-  public UserData copyData(UserData data) {
+  /**
+   * Returns a single copy of a UserData object
+   */
+  public static UserData copyData(UserData data) {
     return new UserData(new StickyHeader(data.stickyHeader), data.hash);
   }
 
-  public void storeData(UserData data, int copies) {
+  /**
+   * Adds a UserData object to the database with specified number of copies
+   */
+  public static void storeData(UserData data, int copies) {
     database.add(data);
     for (int i = 0; i < copies; i++) {
       database.add(copyData(data));
     }
   } 
 
-  public int deleteData(int delHash) {
+  /**
+   * Deletes all UserData objects with the given hash
+   */
+  public static int deleteData(int delHash) {
     int foundData = 0;
     int databaseSize = database.size();
     
@@ -55,7 +53,13 @@ public class ServiceProvider {
     return foundData; //Number deleted
   }
 
-  public StickyHeader accessData(int accessHash) {
+  /**
+   * If the data is present in the databse, 
+   * returns the first UserData object that matches the
+   * given hash and notifies client of access. Otherwise 
+   * returns null.
+   */
+  public static StickyHeader accessData(int accessHash) {
     int databaseSize = database.size();
 
     for (int i = 0; i < databaseSize; i++) {
@@ -65,30 +69,36 @@ public class ServiceProvider {
         return data.stickyHeader;
       }
     }
-    return null; //Data not found or allowed to be accessed
+    return null; //Data not found or not allowed to be accessed
   }
 
-  public StickyHeader interpretMessage(Message msg) {
+  /**
+   * Depending on message type, handle data accordingly.
+   */
+  public static StickyHeader interpretMessage(Message msg) {
     MessageType msgType = msg.getMessageType();    
     StickyHeader msgSH = msg.getStickyHeader();
     int msgHash = msg.getHash();  
 
     switch (msgType) {
+    //Upload data to database with 2 copies 
     case UPLOAD:
       if (msgSH != null && msgHash != 0) {
         storeData(new UserData(msgSH, msgHash), 2); //store data and 2 copies
-        System.out.println("Upload message recieved.\nUpdated database:\n" + this);
-        System.out.println("\nAccess attempt: " + accessData(msgHash));
+        tempHash = msgHash;
+        System.out.println("Upload message recieved.\nUpdated database:\n" + printDatabase());
+        System.out.println("\nAccess attempt: " + accessData(msgHash)); //try to access new data
       }
       else System.out.println("Message upload failed");
       break;
+    //Delete data and send acknowledgement to client
     case DELETE:
       deleteData(msgHash);
-      System.out.println("Delete request recieved.\nUpdated database:\n" + this);
-      //Send client an acknowledgement of deletion request
+      System.out.println("Delete request recieved.\nUpdated database:\n" + printDatabase());
       client.sendMessage(new Message(MessageType.ACKNOWLEDGE));
-      System.out.println("\nAccess attempt: " + accessData(msgHash));
+      System.out.println("\nAccess attempt: " + accessData(msgHash)); //try to access deleted data
       break;
+    //None of the following messages should be recieved by the ServiceProvider
     case NOTIFY:
       System.out.println("Notify message recieved");
       break;
@@ -101,7 +111,10 @@ public class ServiceProvider {
     return msgSH; //Will be null if message was not an upload
   }
 
-  public String toString() {
+  /**
+   * Prints out the current contents of the database
+   */
+  public static String printDatabase() {
     String str = "[ ";
     int databaseSize = database.size();
     for (int i = 0; i < databaseSize; i++) {
@@ -116,18 +129,6 @@ public class ServiceProvider {
     
   public static void main(String[] args) {
     ServiceProvider sp = new ServiceProvider();
-    //sp.server.start();
-    /*try {
-      Message msg = sp.myServer.recieveMessage();
-      sp.interpretMessage(msg);
-      Message delMsg = sp.myServer.recieveMessage();
-      sp.interpretMessage(delMsg);
-    }
-    catch (IOException i) {
-      System.out.println(i);
-    }
-    catch (ClassNotFoundException c) {
-      System.out.println(c);
-    }*/
+    ServiceProvider.server.start();
   }
 }

@@ -1,6 +1,14 @@
 
 import java.io.Serializable;
 
+/**
+ * This class creates Message objects which have all
+ * of the necessary fields to be sent between a User
+ * and a ServiceProvider
+ *
+ * @author Lindsey Coffee-Johnson
+ * @version 1.0
+ */
 public class Message implements Serializable {
 
   private StickyHeader stickyHeader = null;

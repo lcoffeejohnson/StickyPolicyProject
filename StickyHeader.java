@@ -1,6 +1,12 @@
 
 import java.io.Serializable;
 
+/**
+ * This class stores user data along with the related user policy
+ *
+ * @author Lindsey Coffee-Johnson
+ * @version 1.0
+ */
 public class StickyHeader implements Serializable {
 
   private String data = null;
