@@ -6,7 +6,9 @@ import java.sql.Timestamp;
 
 public class ServiceProvider {
 
-  ArrayList<UserData> database = new ArrayList<UserData>();
+  static ArrayList<UserData> database = new ArrayList<UserData>();
+  Server server = null;
+  Client client = null;
 
   public class UserData {
     Timestamp ts = null;
@@ -23,7 +25,11 @@ public class ServiceProvider {
   }
 
   public ServiceProvider() {
-  } 
+    server = new Server(50001, this);
+    client = new Client("localhost", 50002);  
+    server.start();
+  }
+ 
 
   public UserData copyData(UserData data) {
     return new UserData(new StickyHeader(data.stickyHeader), data.hash);
@@ -55,6 +61,7 @@ public class ServiceProvider {
     for (int i = 0; i < databaseSize; i++) {
       UserData data = database.get(i);
       if (data.hash == accessHash && data.valid) {
+        client.sendMessage(new Message(MessageType.NOTIFY));
         return data.stickyHeader;
       }
     }
@@ -78,6 +85,8 @@ public class ServiceProvider {
     case DELETE:
       deleteData(msgHash);
       System.out.println("Delete request recieved.\nUpdated database:\n" + this);
+      //Send client an acknowledgement of deletion request
+      client.sendMessage(new Message(MessageType.ACKNOWLEDGE));
       System.out.println("\nAccess attempt: " + accessData(msgHash));
       break;
     case NOTIFY:
@@ -89,7 +98,6 @@ public class ServiceProvider {
     default:
       System.out.println("Something went wrong here...");
     }
-
     return msgSH; //Will be null if message was not an upload
   }
 
@@ -108,7 +116,7 @@ public class ServiceProvider {
     
   public static void main(String[] args) {
     ServiceProvider sp = new ServiceProvider();
-    new Server(50001, sp).start();
+    //sp.server.start();
     /*try {
       Message msg = sp.myServer.recieveMessage();
       sp.interpretMessage(msg);
@@ -121,6 +129,5 @@ public class ServiceProvider {
     catch (ClassNotFoundException c) {
       System.out.println(c);
     }*/
-  //System.out.println("Database:\n" + sp);
   }
 }

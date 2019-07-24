@@ -2,19 +2,17 @@
 import java.net.*;
 import java.io.*;
 
-public class Server extends Thread {
+public class UserServer extends Thread {
 
   private ServerSocket serverSocket = null;
-  private ServiceProvider serviceProvider = null;  
 
-  public Server(int portNum, ServiceProvider serviceProvider) {
-    this.serviceProvider = serviceProvider;
+  public UserServer(int portNum) {
 
     //Try to establish a connection
     try {
       serverSocket = new ServerSocket(portNum);
-      System.out.println("Server started...");
-    } 
+      System.out.println("User server started...");
+    }
     catch(IOException i) {
       System.out.println(i);
     }
@@ -22,8 +20,9 @@ public class Server extends Thread {
 
   @Override
   public void run() {
+
    Socket socket = null;
- 
+
    try {
       while (true) {
         socket = serverSocket.accept();
@@ -35,8 +34,7 @@ public class Server extends Thread {
           System.out.println(c);
         }
         System.out.println("Recieved message: " + message);
-        serviceProvider.interpretMessage(message);  
-      } 
+      }
     } catch (IOException i) {
       System.out.println(i);
     } finally {

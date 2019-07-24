@@ -4,8 +4,8 @@ import java.io.*;
 
 public class Client {
 
-  String address = null;
-  int portNum = 0;
+  private String address = null;
+  private int portNum = 0;
 
   public Client(String address, int portNum) {
     this.address = address;
