@@ -17,22 +17,20 @@ public class ServiceProvider {
   static Server server = null; 
   static Client client = null; 
 
+  /**
+   * Class contructor which initializes database but does not initialize
+   * server and client
+   */
   public ServiceProvider() {
   }
 
-  /**
-   * Returns a single copy of a UserData object
-   * 
-   * @param data A UserData object to copy
-   * @return  A UserData object with the same sticky header and hash as the input 
-   */
-  public static UserData copyData(UserData data) {
-    return new UserData(new StickyHeader(data.stickyHeader), data.hash);
-  }
-
-  /**
-   * Creates and starts the ServiceProvider's server and client
-   */
+   /**
+    * Creates and starts the ServiceProvider's server and client
+    *
+    * @param serverPort  The port number for the server to connect to
+    * @param address     The IP address for the client to connect to
+    * @param clientPort  The port number for the client to connect to 
+    */
    public static void startServers(int serverPort, String address, int clientPort) {
      if(clientPort != serverPort) { //ServiceProvider's server and client cannot use same port
        server = new Server(serverPort);
@@ -44,7 +42,20 @@ public class ServiceProvider {
    }
 
   /**
+   * Returns a single copy of a UserData object
+   * 
+   * @param data A UserData object to copy
+   * @return     A UserData object with the same sticky header and hash as the input 
+   */
+  public static UserData copyData(UserData data) {
+    return new UserData(new StickyHeader(data.stickyHeader), data.hash);
+  }
+
+  /**
    * Adds a UserData object to the database with specified number of copies
+   * 
+   * @param  data   A UserData object to store in the database
+   * @param  copies The number of copies of the UserData to create and store
    */
   public static void storeData(UserData data, int copies) {
     database.add(data);
@@ -54,7 +65,11 @@ public class ServiceProvider {
   } 
 
   /**
-   * Deletes all UserData objects with the given hash
+   * Deletes all UserData objects with the given hash by changing the valid
+   * value associated with that data to false
+   * 
+   * @param  delHash  The hash of the data to be deleted
+   * @return          The number of data found and deleted
    */
   public static int deleteData(int delHash) {
     int foundData = 0;
@@ -66,14 +81,18 @@ public class ServiceProvider {
         foundData++;
       }
     }
-    return foundData; //Number deleted
+    return foundData;
   }
 
   /**
    * If the data is present in the databse, 
    * returns the first UserData object that matches the
    * given hash and notifies client of access. Otherwise 
-   * returns null.
+   * returns null
+   *
+   * @param accessHash  The hash of the UserData to be accessed
+   * @return            The UserData that matches the given hash, or null if
+   *                    no such UserData can be found or is invalid
    */
   public static StickyHeader accessData(int accessHash) {
     int databaseSize = database.size();
@@ -89,9 +108,14 @@ public class ServiceProvider {
   }
 
   /**
-   * Depending on message type, handle data accordingly.
+   * Interprets a Messages recieved from a User. If the Message is an UPLOAD,
+   * two copies of the recieved data are made and all three pieces of data are
+   * stored. If the Message is a DELETE, the data related to the hash stored 
+   * in the Message is deleted and an ACKNOWLEDGE message is sent to the User
+   *
+   * @param msg  The message to be interpreted
    */
-  public static StickyHeader interpretMessage(Message msg) {
+  public static void interpretMessage(Message msg) {
     MessageType msgType = msg.getMessageType();    
     StickyHeader msgSH = msg.getStickyHeader();
     int msgHash = msg.getHash();  
@@ -123,11 +147,12 @@ public class ServiceProvider {
     default:
       System.out.println("Something went wrong here...");
     }
-    return msgSH; //Will be null if message was not an upload
   }
 
   /**
-   * Prints out the current contents of the database
+   * Returns a String representation of the current contents of the database
+   *
+   * @return  A String representation of the current contents of the database
    */
   public static String printDatabase() {
     String str = "[ ";
@@ -143,12 +168,19 @@ public class ServiceProvider {
   }
   
   /**
-   * Main method for running ServiceProvider 
-   * Takes server port number, client address and client port 
-   * number as arguements
-   * 
+   * Main method for running ServiceProvider. Creates a new ServiceProvider
+   * and starts the server and client with arguements provided
+   * As arguments, takes:
+   *  <server port number> <client address>  <client port number>
    */  
   public static void main(String[] args) {
+    String errMsg = "Please run this program with the following arguments:\n" +
+                    "java ServiceProvider <server port number> <client address>" +
+                    " <client port number>";
+    if (args.length != 3) {
+      System.out.println(errMsg);
+      return;
+    }
     ServiceProvider sp = new ServiceProvider();
     try {
       int serverPort = Integer.parseInt(args[0]);
@@ -156,7 +188,7 @@ public class ServiceProvider {
       int cliPort = Integer.parseInt(args[2]);
       ServiceProvider.startServers(serverPort, cliAddress, cliPort);
     } catch (NumberFormatException n) {
-      System.out.println(n);
+      System.out.println(n + "\n" + errMsg);
     }
   }
 }

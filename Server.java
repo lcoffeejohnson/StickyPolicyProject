@@ -14,7 +14,7 @@ public class Server extends Thread {
   private ServerSocket serverSocket = null;
   
   /**
-   * Class contructor.
+   * Class contructor initializes the ServerSocket
    *
    * @param  portNum  The port number for the server to connect to
    */
@@ -30,7 +30,9 @@ public class Server extends Thread {
   }
 
   /**
-   * Starts the server and continuously seeks clients looking to connect
+   * Starts the server and continuously seeks clients looking to connect. When
+   * a client connects and sends a Message, that message gets passed to the 
+   * ServiceProvider for interpretation
    */  
   @Override
   public void run() {

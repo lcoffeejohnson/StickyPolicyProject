@@ -13,8 +13,12 @@ public class UserServer extends Thread {
 
   private ServerSocket serverSocket = null;
 
+  /**
+   * Class constructor initializes the ServerSocket
+   *
+   * @param portNum  The port number for the server to connect to
+   */
   public UserServer(int portNum) {
-
     //Try to establish a connection
     try {
       serverSocket = new ServerSocket(portNum);
@@ -25,6 +29,9 @@ public class UserServer extends Thread {
     }
   }
 
+  /**
+   * Starts the server and continuously seeks clients trying to connect
+   */
   @Override
   public void run() {
 
