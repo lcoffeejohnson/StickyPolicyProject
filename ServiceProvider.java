@@ -14,18 +14,34 @@ import java.net.*;
 public class ServiceProvider {
 
   static ArrayList<UserData> database = new ArrayList<UserData>();
-  static Server server = new Server(50001);
-  static Client client = new Client("localhost", 50002);
+  static Server server = null; 
+  static Client client = null; 
 
   public ServiceProvider() {
   }
 
   /**
    * Returns a single copy of a UserData object
+   * 
+   * @param data A UserData object to copy
+   * @return  A UserData object with the same sticky header and hash as the input 
    */
   public static UserData copyData(UserData data) {
     return new UserData(new StickyHeader(data.stickyHeader), data.hash);
   }
+
+  /**
+   * Creates and starts the ServiceProvider's server and client
+   */
+   public static void startServers(int serverPort, String address, int clientPort) {
+     if(clientPort != serverPort) { //ServiceProvider's server and client cannot use same port
+       server = new Server(serverPort);
+       client = new Client(address, clientPort);
+       server.start();
+     } else {
+       System.out.print("Server and client port numbers cannot match. Client / server setup aborted.");
+     }
+   }
 
   /**
    * Adds a UserData object to the database with specified number of copies
@@ -85,7 +101,6 @@ public class ServiceProvider {
     case UPLOAD:
       if (msgSH != null && msgHash != 0) {
         storeData(new UserData(msgSH, msgHash), 2); //store data and 2 copies
-        tempHash = msgHash;
         System.out.println("Upload message recieved.\nUpdated database:\n" + printDatabase());
         System.out.println("\nAccess attempt: " + accessData(msgHash)); //try to access new data
       }
@@ -126,9 +141,22 @@ public class ServiceProvider {
     }
     return str;
   }
-    
+  
+  /**
+   * Main method for running ServiceProvider 
+   * Takes server port number, client address and client port 
+   * number as arguements
+   * 
+   */  
   public static void main(String[] args) {
     ServiceProvider sp = new ServiceProvider();
-    ServiceProvider.server.start();
+    try {
+      int serverPort = Integer.parseInt(args[0]);
+      String cliAddress = args[1];
+      int cliPort = Integer.parseInt(args[2]);
+      ServiceProvider.startServers(serverPort, cliAddress, cliPort);
+    } catch (NumberFormatException n) {
+      System.out.println(n);
+    }
   }
 }
