@@ -64,20 +64,30 @@ public class User {
   public static void main(String[] args) {
     Policy policy = new Policy(true, true);
     User user = new User(policy);
+    User userB = new User(policy);
+
     //Start servers
     try {
       int serverPort = Integer.parseInt(args[0]);
       String cliAddress = args[1];
       int cliPort = Integer.parseInt(args[2]);
       user.startServers(serverPort, cliAddress, cliPort);
+      userB.startServers(serverPort, cliAddress, cliPort);
     } catch (NumberFormatException n) {
       System.out.println(n);
     }
+
     //Upload user data
     boolean sent = user.uploadData("This is some data...");
     if(sent) System.out.println("Data sent successfully!");
     else System.out.println("There was an error in sending the data");
-    //Request sent data to be delted
+
+    boolean sentB = userB. uploadData("MORE DATA!");
+    if(sentB) System.out.println("DataB sent successfully!");
+
+    //Request sent data to be deleted
+
     user.deleteData(user.hashVals.get(0));
+    userB.deleteData(userB.hashVals.get(0));
   }
 }
