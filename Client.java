@@ -13,13 +13,22 @@ public class Client {
   private String address = null;
   private int portNum = 0;
 
+  /**
+   * Class constructor.
+   *
+   * @param  address  The IP address for the client to connect to
+   * @param  portNum  The port number for the client to connect to 
+   */
   public Client(String address, int portNum) {
     this.address = address;
     this. portNum = portNum;
   }
 
   /**
-   * Sends a message of type Message
+   * Sends a message of type Message to the ServiceProvider
+   *
+   * @param message  A Message object to be sent
+   * @return         True if message was sent successfully, false otherwise
    */
   public boolean sendMessage(Message message) {
       try {
